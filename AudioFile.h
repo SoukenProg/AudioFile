@@ -294,7 +294,7 @@ static std::unordered_map <uint32_t, std::vector<uint8_t>> aiffSampleRateTable =
 };
 
 //=============================================================
-enum WavAudioFormat
+enum WaveAudioFormat
 {
     PCM = 0x0001,
     IEEEFloat = 0x0003,
@@ -615,7 +615,7 @@ bool AudioFile<T>::decodeWaveFile (std::vector<uint8_t>& fileData)
     uint16_t numBytesPerSample = static_cast<uint16_t> (bitDepth) / 8;
     
     // check that the audio format is PCM or Float or extensible
-    if (audioFormat != WavAudioFormat::PCM && audioFormat != WavAudioFormat::IEEEFloat && audioFormat != WavAudioFormat::Extensible)
+    if (audioFormat != WaveAudioFormat::PCM && audioFormat != WaveAudioFormat::IEEEFloat && audioFormat != WaveAudioFormat::Extensible)
     {
         reportError ("ERROR: this .WAV file is encoded in a format that this library does not support at present");
         return false;
@@ -693,7 +693,7 @@ bool AudioFile<T>::decodeWaveFile (std::vector<uint8_t>& fileData)
                 int32_t sampleAsInt = fourBytesToInt (fileData, sampleIndex);
                 T sample;
                 
-                if (audioFormat == WavAudioFormat::IEEEFloat && std::is_floating_point_v<T>) 
+                if (audioFormat == WaveAudioFormat::IEEEFloat && std::is_floating_point_v<T>)
                 {
                     float f;
                     memcpy (&f, &sampleAsInt, sizeof(int32_t));
@@ -939,8 +939,8 @@ bool AudioFile<T>::saveToWaveFile (std::string filePath)
     std::vector<uint8_t> fileData;
     
     int32_t dataChunkSize = getNumSamplesPerChannel() * (getNumChannels() * bitDepth / 8);
-    int16_t audioFormat = bitDepth == 32 && std::is_floating_point_v<T> ? WavAudioFormat::IEEEFloat : WavAudioFormat::PCM;
-    int32_t formatChunkSize = audioFormat == WavAudioFormat::PCM ? 16 : 18;
+    int16_t audioFormat = bitDepth == 32 && std::is_floating_point_v<T> ? WaveAudioFormat::IEEEFloat : WaveAudioFormat::PCM;
+    int32_t formatChunkSize = audioFormat == WaveAudioFormat::PCM ? 16 : 18;
     int32_t iXMLChunkSize = static_cast<int32_t> (iXMLChunk.size());
     
     // -----------------------------------------------------------
@@ -975,7 +975,7 @@ bool AudioFile<T>::saveToWaveFile (std::string filePath)
     
     addInt16ToFileData (fileData, (int16_t)bitDepth);
     
-    if (audioFormat == WavAudioFormat::IEEEFloat)
+    if (audioFormat == WaveAudioFormat::IEEEFloat)
         addInt16ToFileData (fileData, 0); // extension size
     
     // -----------------------------------------------------------
@@ -1014,7 +1014,7 @@ bool AudioFile<T>::saveToWaveFile (std::string filePath)
             {
                 int32_t sampleAsInt;
                 
-                if (audioFormat == WavAudioFormat::IEEEFloat)
+                if (audioFormat == WaveAudioFormat::IEEEFloat)
                     sampleAsInt = (int32_t) reinterpret_cast<int32_t&> (samples[channel][i]);
                 else // assume PCM
                     sampleAsInt = AudioSampleConverter<T>::sampleToThirtyTwoBitInt (samples[channel][i]);
